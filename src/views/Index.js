@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 // import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import for navigation (React Router v6)
+=======
+import { useState } from "react";
+>>>>>>> a939b0da1174695c23cdddc14832c28e4814c8a9
 // reactstrap components
 import {
   Card,
@@ -15,6 +19,7 @@ import {
 import Header from "components/Headers/Header.js";
 
 const Index = (props) => {
+<<<<<<< HEAD
   const navigate = useNavigate(); // Hook to handle navigation
 
   // Function to handle redirection
@@ -22,6 +27,8 @@ const Index = (props) => {
     navigate("/tables"); // Replace with the route for the table page
   };
 
+=======
+>>>>>>> a939b0da1174695c23cdddc14832c28e4814c8a9
   return (
     <>
       <Header />
@@ -34,7 +41,11 @@ const Index = (props) => {
               style={{
                 marginTop: "2in",
                 padding: "20px",
+<<<<<<< HEAD
                 width: "95%",
+=======
+                width: "95%", // Updated width
+>>>>>>> a939b0da1174695c23cdddc14832c28e4814c8a9
                 marginLeft: "auto",
                 marginRight: "auto",
               }}
@@ -56,13 +67,17 @@ const Index = (props) => {
                     <th scope="col">Event</th>
                     <th scope="col">Date</th>
                     <th scope="col">Participants</th>
+<<<<<<< HEAD
                     <th scope="col">Connect</th>
+=======
+>>>>>>> a939b0da1174695c23cdddc14832c28e4814c8a9
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td>Cooking Event</td>
                     <td>10/05/2024 6:00 PM</td>
+<<<<<<< HEAD
                     <td>Star Lopez</td>
                     <td>
                       <Button
@@ -78,11 +93,15 @@ const Index = (props) => {
                         Message with Star
                       </Button>
                     </td>
+=======
+                    <td>Star Lopez, John Tyler</td>
+>>>>>>> a939b0da1174695c23cdddc14832c28e4814c8a9
                   </tr>
                   <tr>
                     <td>Biking</td>
                     <td>11/21/2024 8:00 AM</td>
                     <td>John Tyler</td>
+<<<<<<< HEAD
                     <td>
                       <Button
                         style={{
@@ -97,6 +116,8 @@ const Index = (props) => {
                         Message with John
                       </Button>
                     </td>
+=======
+>>>>>>> a939b0da1174695c23cdddc14832c28e4814c8a9
                   </tr>
                 </tbody>
               </Table>
