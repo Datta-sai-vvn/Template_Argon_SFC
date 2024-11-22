@@ -25,15 +25,28 @@ import "assets/scss/argon-dashboard-react.scss";
 
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
+import Register from "./components/Register";
+import Login from "components/Login";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
+
 root.render(
   <BrowserRouter>
-    <Routes>
-      <Route path="/admin/*" element={<AdminLayout />} />
-      <Route path="/auth/*" element={<AuthLayout />} />
-      <Route path="*" element={<Navigate to="/admin/index" replace />} />
-    </Routes>
+    <React.StrictMode>
+      <Routes>
+        {/* Example of setting up routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        
+        {/* Optionally, if you're using layout components */}
+        <Route path="/admin/*" element={<AdminLayout />} />
+        <Route path="/auth/*" element={<AuthLayout />} />
+
+        {/* Redirect or fallback route */}
+        <Route path="/" element={<Navigate to="/register" />} />
+      </Routes>
+    </React.StrictMode>
   </BrowserRouter>
 );
+
