@@ -1,22 +1,4 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2024 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
-// reactstrap components
+import React, { useState } from "react";
 import {
   Button,
   Card,
@@ -33,6 +15,35 @@ import {
 import UserHeader from "components/Headers/UserHeader.js";
 
 const Profile = () => {
+  // State to store form values
+  const [formData, setFormData] = useState({
+    name: "",
+    nickName: "",
+    age: "",
+    gender: "",
+    email: "",
+    city: "",
+    instagram: "",
+    linkedin: "",
+    about: "",
+  });
+
+  // Handler for input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // Handler for form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Submitted Data:", formData);
+    // Add further logic to save data to a database or perform another action
+  };
+
   return (
     <>
       <UserHeader />
@@ -48,79 +59,69 @@ const Profile = () => {
                       <img
                         alt="..."
                         className="rounded-circle"
-                        src={require("../../assets/img/theme/team-4-800x800.jpg")}
+                        // src={require("../../assets/img/theme/profilepic.jpeg")}
                       />
                     </a>
                   </div>
                 </Col>
               </Row>
               <CardHeader className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
-                <div className="d-flex justify-content-between">
-                  <Button
-                    className="mr-4"
-                    color="info"
-                    href="#pablo"
-                    onClick={(e) => e.preventDefault()}
-                    size="sm"
-                  >
-                    Connect
-                  </Button>
-                  <Button
-                    className="float-right"
-                    color="default"
-                    href="#pablo"
-                    onClick={(e) => e.preventDefault()}
-                    size="sm"
-                  >
-                    Message
-                  </Button>
-                </div>
+                <div className="d-flex justify-content-between"></div>
               </CardHeader>
               <CardBody className="pt-0 pt-md-4">
                 <Row>
                   <div className="col">
                     <div className="card-profile-stats d-flex justify-content-center mt-md-5">
-                      <div>
-                        <span className="heading">22</span>
-                        <span className="description">Friends</span>
-                      </div>
-                      <div>
-                        <span className="heading">10</span>
-                        <span className="description">Photos</span>
-                      </div>
-                      <div>
-                        <span className="heading">89</span>
-                        <span className="description">Comments</span>
-                      </div>
+                    <div>
+  <span className="heading">{formData.nickName || "N/A"}</span>
+  <span className="description">Nickname</span>
+</div>
+<div>
+  <span className="heading">{formData.age || "N/A"}</span>
+  <span className="description">Age</span>
+</div>
+<div>
+  <span className="heading">{formData.gender || "N/A"}</span>
+  <span className="description">Gender</span>
+</div>
+
                     </div>
                   </div>
                 </Row>
                 <div className="text-center">
-                  <h3>
-                    Jessica Jones
-                    <span className="font-weight-light">, 27</span>
-                  </h3>
-                  <div className="h5 font-weight-300">
-                    <i className="ni location_pin mr-2" />
-                    Bucharest, Romania
-                  </div>
-                  <div className="h5 mt-4">
-                    <i className="ni business_briefcase-24 mr-2" />
-                    Solution Manager - Creative Tim Officer
-                  </div>
+                <div className="text-center">
+  <h3>
+    {formData.name || "user"}
+    
+  </h3>
+  
+</div>
+
+<div className="h5 font-weight-300">
+  <i className="ni location_pin mr-2" />
+  {formData.email || ""}
+</div>
+
+<div className="h5 mt-4">
+  <i className="ni business_briefcase-24 mr-2" />
+  Instagram: {formData.instagram || "Not provided"}
+</div>
+<div className="h5 mt-4">
+  <i className="ni business_briefcase-24 mr-2" />
+  LinkedIn: {formData.linkedin || "Not provided"}
+</div>
+
                   <div>
-                    <i className="ni education_hat mr-2" />
-                    University of Computer Science
-                  </div>
+  <i className="ni location_pin mr-2" />
+  {formData.city || "City not specified"}
+</div>
+
                   <hr className="my-4" />
                   <p>
-                    Ryan — the name taken by Melbourne-raised, Brooklyn-based
-                    Nick Murphy — writes, performs and records all of his own
-                    music.
-                  </p>
-                  <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                    Show more
-                  </a>
+  {formData.about || "A few words about yourself..."}
+</p>
+
+                  
                 </div>
               </CardBody>
             </Card>
@@ -145,7 +146,7 @@ const Profile = () => {
                 </Row>
               </CardHeader>
               <CardBody>
-                <Form>
+                <Form onSubmit={handleSubmit}>
                   <h6 className="heading-small text-muted mb-4">
                     User information
                   </h6>
@@ -155,16 +156,18 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-username"
+                            htmlFor="input-name"
                           >
-                            Username
+                            Name
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="lucky.jesse"
-                            id="input-username"
-                            placeholder="Username"
+                            id="input-name"
+                            placeholder="Name"
                             type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
                           />
                         </FormGroup>
                       </Col>
@@ -172,15 +175,18 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-email"
+                            htmlFor="input-nickname"
                           >
-                            Email address
+                            Nickname
                           </label>
                           <Input
                             className="form-control-alternative"
-                            id="input-email"
-                            placeholder="jesse@example.com"
-                            type="email"
+                            id="input-nickname"
+                            placeholder="Nickname"
+                            type="text"
+                            name="nickName"
+                            value={formData.nickName}
+                            onChange={handleInputChange}
                           />
                         </FormGroup>
                       </Col>
@@ -190,16 +196,18 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-first-name"
+                            htmlFor="input-age"
                           >
-                            First name
+                            Age
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Lucky"
-                            id="input-first-name"
-                            placeholder="First name"
-                            type="text"
+                            id="input-age"
+                            placeholder="Age"
+                            type="number"
+                            name="age"
+                            value={formData.age}
+                            onChange={handleInputChange}
                           />
                         </FormGroup>
                       </Col>
@@ -207,23 +215,28 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-last-name"
+                            htmlFor="input-gender"
                           >
-                            Last name
+                            Gender
                           </label>
                           <Input
+                            type="select"
+                            name="gender"
+                            id="input-gender"
                             className="form-control-alternative"
-                            defaultValue="Jesse"
-                            id="input-last-name"
-                            placeholder="Last name"
-                            type="text"
-                          />
+                            value={formData.gender}
+                            onChange={handleInputChange}
+                          >
+                            <option value="">Select Gender</option>
+                            <option value="female">Female</option>
+                            <option value="male">Male</option>
+                            <option value="other">Other</option>
+                          </Input>
                         </FormGroup>
                       </Col>
                     </Row>
                   </div>
                   <hr className="my-4" />
-                  {/* Address */}
                   <h6 className="heading-small text-muted mb-4">
                     Contact information
                   </h6>
@@ -233,16 +246,18 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-address"
+                            htmlFor="input-email"
                           >
-                            Address
+                            Email ID
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                            id="input-address"
-                            placeholder="Home Address"
+                            id="input-email"
+                            placeholder="Email Address"
                             type="text"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
                           />
                         </FormGroup>
                       </Col>
@@ -258,10 +273,12 @@ const Profile = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="New York"
                             id="input-city"
                             placeholder="City"
                             type="text"
+                            name="city"
+                            value={formData.city}
+                            onChange={handleInputChange}
                           />
                         </FormGroup>
                       </Col>
@@ -269,16 +286,18 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-country"
+                            htmlFor="input-instagram"
                           >
-                            Country
+                            Instagram ID
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="United States"
-                            id="input-country"
-                            placeholder="Country"
+                            id="input-instagram"
+                            placeholder="Instagram ID"
                             type="text"
+                            name="instagram"
+                            value={formData.instagram}
+                            onChange={handleInputChange}
                           />
                         </FormGroup>
                       </Col>
@@ -286,22 +305,24 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-country"
+                            htmlFor="input-linkedin"
                           >
-                            Postal code
+                            LinkedIn
                           </label>
                           <Input
                             className="form-control-alternative"
-                            id="input-postal-code"
-                            placeholder="Postal code"
-                            type="number"
+                            id="input-linkedin"
+                            placeholder="LinkedIn ID"
+                            type="text"
+                            name="linkedin"
+                            value={formData.linkedin}
+                            onChange={handleInputChange}
                           />
                         </FormGroup>
                       </Col>
                     </Row>
                   </div>
                   <hr className="my-4" />
-                  {/* Description */}
                   <h6 className="heading-small text-muted mb-4">About me</h6>
                   <div className="pl-lg-4">
                     <FormGroup>
@@ -310,12 +331,16 @@ const Profile = () => {
                         className="form-control-alternative"
                         placeholder="A few words about you ..."
                         rows="4"
-                        defaultValue="A beautiful Dashboard for Bootstrap 4. It is Free and
-                        Open Source."
                         type="textarea"
+                        name="about"
+                        value={formData.about}
+                        onChange={handleInputChange}
                       />
                     </FormGroup>
                   </div>
+                  <Button color="primary" type="submit">
+                    Save
+                  </Button>
                 </Form>
               </CardBody>
             </Card>
