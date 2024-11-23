@@ -101,18 +101,30 @@ const Sidebar = (props) => {
           type="button"
           onClick={toggleCollapse}
         >
-          <span className="navbar-toggler-icon" />
+          <span className="navbar-toggler-icon"/>
         </button>
         {/* Brand */}
-        {logo ? (
-          <NavbarBrand className="pt-0" {...navbarBrandProps}>
-            <img
-              alt={logo.imgAlt}
-              className="navbar-brand-img"
-              src={logo.imgSrc}
-            />
-          </NavbarBrand>
-        ) : null}
+       
+          {/* Brand */}
+{logo ? (
+  <NavbarBrand className="pt-0" {...navbarBrandProps}>
+    <div style={{ display: "flex", alignItems: "center" }}>
+      {/* Logo Image */}
+      <img
+        alt={logo.imgAlt}
+        className="navbar-brand-img"
+        src={logo.imgSrc}
+        style={{ height: "40px", marginRight: "10px" }}
+      />
+      {/* Text next to Logo */}
+      <span style={{ fontSize: "18px", fontWeight: "bold", color: "#5e72e4" }}>
+        Socioflare Connect
+      </span>
+    </div>
+  </NavbarBrand>
+) : null}
+
+       
         {/* User */}
         <Nav className="align-items-center d-md-none">
           <UncontrolledDropdown nav>

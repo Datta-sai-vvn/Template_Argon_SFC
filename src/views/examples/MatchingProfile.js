@@ -31,73 +31,142 @@ const MatchingProfile = () => {
 
   return (
     <Card
-      className="shadow"
+      className="shadow-lg rounded-4"
       style={{
-        backgroundColor: "#f0f4f8", // Light gray background
-        border: "1px solid #dee2e6", // Optional border for better appearance
-        borderRadius: "8px",
+        backgroundColor: "#ffffff",
+        padding: "30px",
+        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
       }}
     >
       <CardBody>
         {/* Page Heading */}
-        <h3 className="mb-4">Matching Profiles</h3>
+        <h3
+          className="mb-4"
+          style={{
+            color: "#5D3FD3", // Icon-based purple
+            fontSize: "2.5rem",
+            fontWeight: "700",
+            textAlign: "center",
+            letterSpacing: "1px",
+          }}
+        >
+          Matching Profiles
+        </h3>
 
         {/* Filter Section */}
-        <Row className="mb-4">
+        <Row className="mb-5">
           <Col md="3">
             <FormGroup>
-              <Label for="nameFilter">Name</Label>
+              <Label for="nameFilter" style={{ fontSize: "1.1rem", color: "#5D3FD3" }}>
+                Name
+              </Label>
               <Input
                 id="nameFilter"
                 placeholder="Enter Name"
                 value={filters.name}
                 onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+                style={{
+                  borderRadius: "8px",
+                  padding: "12px",
+                  border: "1px solid #ddd",
+                  background: "#f4f5f7",
+                }}
               />
             </FormGroup>
           </Col>
           <Col md="3">
             <FormGroup>
-              <Label for="ageFilter">Age</Label>
+              <Label for="ageFilter" style={{ fontSize: "1.1rem", color: "#5D3FD3" }}>
+                Age
+              </Label>
               <Input
                 id="ageFilter"
                 placeholder="Enter Age"
                 value={filters.age}
                 onChange={(e) => setFilters({ ...filters, age: e.target.value })}
+                style={{
+                  borderRadius: "8px",
+                  padding: "12px",
+                  border: "1px solid #ddd",
+                  background: "#f4f5f7",
+                }}
               />
             </FormGroup>
           </Col>
           <Col md="3">
             <FormGroup>
-              <Label for="interestLevelFilter">Interest Level</Label>
+              <Label for="interestLevelFilter" style={{ fontSize: "1.1rem", color: "#5D3FD3" }}>
+                Interest Level
+              </Label>
               <Input
                 id="interestLevelFilter"
                 placeholder="Enter Interest Level"
                 value={filters.interestLevel}
                 onChange={(e) => setFilters({ ...filters, interestLevel: e.target.value })}
+                style={{
+                  borderRadius: "8px",
+                  padding: "12px",
+                  border: "1px solid #ddd",
+                  background: "#f4f5f7",
+                }}
               />
             </FormGroup>
           </Col>
           <Col md="3">
             <FormGroup>
-              <Label for="genderFilter">Gender</Label>
+              <Label for="genderFilter" style={{ fontSize: "1.1rem", color: "#5D3FD3" }}>
+                Gender
+              </Label>
               <Input
                 id="genderFilter"
                 placeholder="Enter Gender (Male/Female)"
                 value={filters.gender}
                 onChange={(e) => setFilters({ ...filters, gender: e.target.value })}
+                style={{
+                  borderRadius: "8px",
+                  padding: "12px",
+                  border: "1px solid #ddd",
+                  background: "#f4f5f7",
+                }}
               />
             </FormGroup>
           </Col>
-          <Col md="12">
-            <Button color="primary" onClick={applyFilters}>
+          <Col md="12" style={{ textAlign: "center" }}>
+            <Button
+              color="primary"
+              onClick={applyFilters}
+              style={{
+                background: "linear-gradient(90deg, #5D3FD3, #FF6F91)", // Icon-based gradient
+                borderColor: "transparent",
+                padding: "12px 25px",
+                fontSize: "1.2rem",
+                borderRadius: "12px",
+                boxShadow: "0 5px 10px rgba(0, 0, 0, 0.1)",
+                transition: "all 0.3s ease",
+              }}
+            >
               Apply Filters
             </Button>
           </Col>
         </Row>
 
         {/* Data Table */}
-        <Table className="align-items-center table-flush" responsive>
-          <thead className="thead-light">
+        <Table
+          className="align-items-center table-flush"
+          responsive
+          style={{
+            borderCollapse: "separate",
+            borderSpacing: "0 15px",
+          }}
+        >
+          <thead
+            className="thead-light"
+            style={{
+              backgroundColor: "#5D3FD3", // Icon-based purple
+              color: "#fff",
+              textAlign: "center",
+            }}
+          >
             <tr>
               <th scope="col">Name</th>
               <th scope="col">Age</th>
@@ -109,17 +178,32 @@ const MatchingProfile = () => {
           </thead>
           <tbody>
             {filteredData.map((row, index) => (
-              <tr key={index}>
-                <td>{row.name}</td>
-                <td>{row.age}</td>
-                <td>{row.gender}</td>
-                <td>{row.event}</td>
-                <td>{row.interestLevel}</td>
-                <td>
+              <tr
+                key={index}
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  borderRadius: "10px",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                <td style={{ textAlign: "center" }}>{row.name}</td>
+                <td style={{ textAlign: "center" }}>{row.age}</td>
+                <td style={{ textAlign: "center" }}>{row.gender}</td>
+                <td style={{ textAlign: "center" }}>{row.event}</td>
+                <td style={{ textAlign: "center" }}>{row.interestLevel}</td>
+                <td style={{ textAlign: "center" }}>
                   <Button
                     color="primary"
                     size="sm"
                     onClick={() => navigate("/admin/chats")}
+                    style={{
+                      background: "linear-gradient(90deg, #FF6F91, #5D3FD3)", // Gradient for "Connect"
+                      borderColor: "transparent",
+                      padding: "8px 16px",
+                      borderRadius: "10px",
+                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                      transition: "all 0.3s ease",
+                    }}
                   >
                     Connect
                   </Button>

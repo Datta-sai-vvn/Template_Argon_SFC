@@ -30,48 +30,76 @@ const Index = (props) => {
         <Row style={{ width: "100%" }}>
           <Col xl="12">
             <Card
-              className="bg-default shadow"
+              className="shadow"
               style={{
                 marginTop: "2in",
                 padding: "20px",
                 width: "95%",
                 marginLeft: "auto",
                 marginRight: "auto",
+                background: "#FF69B4", // Hot pink background
+                borderRadius: "10px",
+                color: "#FFFFFF", // White text for good contrast
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)", // Subtle shadow for depth
               }}
             >
-              <CardHeader className="bg-transparent border-0 text-center">
-                <h3 className="text-white mb-0">Past Activity Info</h3>
+              <CardHeader
+                className="border-0 text-center"
+                style={{
+                  backgroundColor: "transparent",
+                  color: "#FFFFFF", // White text color for "Past Activity Info"
+                }}
+              >
+                <h3
+                  className="mb-0"
+                  style={{
+                    fontWeight: "bold",
+                    color: "#FFFFFF", // Ensure text is white
+                  }}
+                >
+                  Past Activity Info
+                </h3>
               </CardHeader>
               <Table
-                className="align-items-center table-dark table-flush"
+                className="align-items-center table-flush"
                 responsive
                 style={{
                   marginTop: "15px",
                   marginBottom: "15px",
                   textAlign: "center",
+                  background: "transparent", // Transparent table
                 }}
               >
-                <thead className="thead-dark">
-                  <tr>
-                    <th scope="col">Event</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Participants</th>
-                    <th scope="col">Connect</th>
+                <thead>
+                  <tr style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}>
+                    <th scope="col" style={{ color: "#FFFFFF" }}>
+                      Event
+                    </th>
+                    <th scope="col" style={{ color: "#FFFFFF" }}>
+                      Date
+                    </th>
+                    <th scope="col" style={{ color: "#FFFFFF" }}>
+                      Participants
+                    </th>
+                    <th scope="col" style={{ color: "#FFFFFF" }}>
+                      Connect
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Cooking Event</td>
-                    <td>10/05/2024 6:00 PM</td>
-                    <td>Star Lopez</td>
+                    <td style={{ color: "#FFFFFF" }}>Cooking Event</td>
+                    <td style={{ color: "#FFFFFF" }}>10/05/2024 6:00 PM</td>
+                    <td style={{ color: "#FFFFFF" }}>Star Lopez</td>
                     <td>
                       <Button
                         style={{
-                          backgroundColor: "#6C63FF", // Custom button color
-                          color: "#fff",
+                          background: "linear-gradient(90deg, #FF69B4, #6C63FF)", // Gradient with pink and purple
+                          color: "#FFFFFF",
                           border: "none",
                           padding: "5px 10px",
                           borderRadius: "5px",
+                          fontWeight: "bold",
                         }}
                         onClick={redirectToTablePage} // Redirect on click
                       >
@@ -80,17 +108,18 @@ const Index = (props) => {
                     </td>
                   </tr>
                   <tr>
-                    <td>Biking</td>
-                    <td>11/21/2024 8:00 AM</td>
-                    <td>John Tyler</td>
+                    <td style={{ color: "#FFFFFF" }}>Biking</td>
+                    <td style={{ color: "#FFFFFF" }}>11/21/2024 8:00 AM</td>
+                    <td style={{ color: "#FFFFFF" }}>John Tyler</td>
                     <td>
                       <Button
                         style={{
-                          backgroundColor: "#6C63FF", // Custom button color
-                          color: "#fff",
+                          background: "linear-gradient(90deg, #FF69B4, #6C63FF)", // Gradient with pink and purple
+                          color: "#FFFFFF",
                           border: "none",
                           padding: "5px 10px",
                           borderRadius: "5px",
+                          fontWeight: "bold",
                         }}
                         onClick={redirectToTablePage} // Redirect on click
                       >

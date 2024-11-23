@@ -71,12 +71,37 @@ const Icons = () => {
     <>
       <Header />
       {/* Page content */}
-      <Container className="mt--7" fluid>
+      <Container
+        className="mt--7"
+        fluid
+        style={{
+          background: "linear-gradient(135deg, #FF69B4, #6C63FF)", // Gradient background
+          minHeight: "100vh",
+          padding: "2rem",
+          borderRadius: "10px",
+        }}
+      >
         <Row>
           <div className="col">
-            <Card className="shadow">
-              <CardHeader className="bg-transparent">
-                <h3 className="mb-0">Choose an Event</h3>
+            <Card
+              className="shadow"
+              style={{
+                background: "rgba(255, 255, 255, 0.2)", // Semi-transparent card
+                borderRadius: "15px",
+                color: "#FFFFFF",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+              }}
+            >
+              <CardHeader
+                className="bg-transparent"
+                style={{
+                  textAlign: "center",
+                  color: "#FFFFFF",
+                  fontWeight: "bold",
+                  fontSize: "1.5rem",
+                }}
+              >
+                Choose an Event
               </CardHeader>
               <CardBody>
                 <Row>
@@ -84,11 +109,20 @@ const Icons = () => {
                     <Col lg="3" md="6" className="mb-3" key={index}>
                       <Button
                         style={{
-                          backgroundColor: "#00bfff", // Blue color
-                          borderColor: "#00bfff",
-                          color: "#fff",
+                          background:
+                            selectedEvent === event
+                              ? "linear-gradient(90deg, #FF69B4, #6C63FF)" // Highlight selected event
+                              : "#ffffff", // White background for others
+                          borderColor: selectedEvent === event ? "#FFFFFF" : "transparent",
+                          color: selectedEvent === event ? "#FFFFFF" : "#6C63FF", // Text color change
+                          fontWeight: "bold",
+                          borderRadius: "10px",
+                          padding: "15px 25px",
+                          fontSize: "1rem", // Adjusted font size for readability
+                          boxShadow: selectedEvent === event ? "0 4px 8px rgba(0, 0, 0, 0.1)" : "none", // Added shadow to selected button
+                          transition: "all 0.3s ease", // Smooth transition
                         }}
-                        className={`w-100 ${selectedEvent === event ? "active" : ""}`}
+                        className="w-100"
                         onClick={() => setSelectedEvent(event)}
                       >
                         {event}
@@ -103,13 +137,18 @@ const Icons = () => {
                       margin: "20px auto",
                       textAlign: "center",
                       padding: "20px",
-                      border: "2px solid #00bfff",
+                      border: "2px solid rgba(255, 255, 255, 0.5)",
                       borderRadius: "10px",
-                      backgroundColor: "#e6f7ff",
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
                     }}
                   >
-                    {/* Increased heading size */}
-                    <h2 style={{ color: "#00bfff", fontSize: "2rem", fontWeight: "bold" }}>
+                    <h2
+                      style={{
+                        color: "#FFFFFF",
+                        fontSize: "2rem",
+                        fontWeight: "bold",
+                      }}
+                    >
                       How interested are you in {selectedEvent}?
                     </h2>
                     <input
@@ -120,9 +159,9 @@ const Icons = () => {
                       onChange={(e) => setInterestLevel(Number(e.target.value))}
                       style={{
                         width: "100%",
-                        height: "25px", // Increased height
+                        height: "20px",
                         borderRadius: "15px",
-                        background: "#d0eaff",
+                        background: "linear-gradient(90deg, #FF69B4, #6C63FF)",
                         margin: "10px 0",
                         appearance: "none",
                         outline: "none",
@@ -134,46 +173,48 @@ const Icons = () => {
                         input[type="range"]::-webkit-slider-thumb {
                           -webkit-appearance: none;
                           appearance: none;
-                          width: 30px;
-                          height: 30px;
-                          background: #fff;
-                          border: 2px solid #00bfff;
+                          width: 25px;
+                          height: 25px;
+                          background: #FFFFFF;
+                          border: 2px solid #FF69B4;
                           border-radius: 50%;
                           cursor: pointer;
                           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
                         }
                         input[type="range"]::-moz-range-thumb {
-                          width: 30px;
-                          height: 30px;
-                          background: #fff;
-                          border: 2px solid #00bfff;
+                          width: 25px;
+                          height: 25px;
+                          background: #FFFFFF;
+                          border: 2px solid #FF69B4;
                           border-radius: 50%;
                           cursor: pointer;
                         }
                       `}
                     </style>
-                    {/* Bold and larger font for interest level */}
-                    <p style={{ fontSize: "2rem", fontWeight: "bold", color: "#00bfff" }}>
+                    <p
+                      style={{
+                        fontSize: "2rem",
+                        fontWeight: "bold",
+                        color: "#FFFFFF",
+                      }}
+                    >
                       Interest Level: {interestLevel}
                     </p>
-                    {/* Bold and increased size for slider labels */}
                     <div
                       style={{
                         display: "flex",
                         justifyContent: "space-between",
                         fontWeight: "bold",
-                        fontSize: "1.2rem",
+                        fontSize: "1rem",
+                        color: "#FFFFFF",
                       }}
                     >
                       {[...Array(10).keys()].map((i) => (
-                        <span key={i} style={{ color: "#00bfff" }}>
-                          {i + 1}
-                        </span>
+                        <span key={i}>{i + 1}</span>
                       ))}
                     </div>
                   </div>
                 )}
-                {/* Increased size of the continue button */}
                 <div style={{ textAlign: "center", marginTop: "20px" }}>
                   <Button
                     color="info"
@@ -181,10 +222,14 @@ const Icons = () => {
                     onClick={handleContinueClick}
                     disabled={!selectedEvent}
                     style={{
-                      backgroundColor: "#00bfff",
-                      borderColor: "#00bfff",
+                      background: "linear-gradient(90deg, #FF69B4, #6C63FF)",
+                      borderColor: "transparent",
                       fontSize: "1.5rem",
-                      padding: "15px 30px", // Increased size
+                      padding: "15px 30px",
+                      color: "#FFFFFF",
+                      fontWeight: "bold",
+                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                      transition: "all 0.3s ease",
                     }}
                   >
                     Continue
