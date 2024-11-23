@@ -11,7 +11,9 @@ import {
 } from "reactstrap";
 // core components
 import Header from "components/Headers/Header.js";
-import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
+import { useNavigate } from "react-router-dom"; 
+import { getFirestore, doc, setDoc } from "firebase/firestore"; 
+import { getAuth } from "firebase/auth"; 
 
 // Event List
 const eventList = [
@@ -54,17 +56,39 @@ const Icons = () => {
   const [interestLevel, setInterestLevel] = useState(5); // Default interest level
   const navigate = useNavigate(); // Hook to navigate to different routes
 
+  const db = getFirestore();
+  const auth = getAuth();
+
   // Handle Continue Button
-  const handleContinueClick = () => {
+  const handleContinueClick = async () => {
     if (!selectedEvent) {
       alert("Please select an event before continuing.");
       return;
     }
 
-    // Redirect to Matching Profile Page with optional state or query parameters
-    navigate("/admin/matching-profile", {
-      state: { event: selectedEvent, interestLevel },
-    });
+    const user = auth.currentUser;
+    if (!user) {
+      alert("No user is logged in.");
+      return;
+    }
+
+    const uid = user.uid; 
+    const userDocRef = doc(db, "users", uid); 
+
+    try {
+      await setDoc(userDocRef, {
+        selectedEvent,
+        interestLevel,
+      }, { merge: true });
+
+      console.log("Event and interest level saved successfully.");
+      navigate("/admin/matching-profile", {
+        state: { event: selectedEvent, interestLevel },
+      });
+    } catch (error) {
+      console.error("Error saving data to Firestore:", error);
+      alert("An error occurred while saving your data.");
+    }
   };
 
   return (

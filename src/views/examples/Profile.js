@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { db } from "../../firebase/firebaseConfig";
+
 import {
   Button,
   Card,
@@ -26,9 +30,36 @@ const Profile = () => {
     instagram: "",
     linkedin: "",
     about: "",
+    selectedEvent: null,
+    interestLevel: 5,
   });
 
-  // Handler for input changes
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = getAuth().currentUser;
+      if (!user) {
+        alert("No user logged in");
+        return;
+      }
+
+      const uid = user.uid; 
+
+      try {
+        const userDocRef = doc(db, "users", uid);
+        const docSnapshot = await getDoc(userDocRef);
+        if (docSnapshot.exists()) {
+          setFormData(docSnapshot.data()); 
+        } else {
+          console.log("No such user data!");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []); 
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -37,11 +68,25 @@ const Profile = () => {
     }));
   };
 
-  // Handler for form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted Data:", formData);
-    // Add further logic to save data to a database or perform another action
+
+    const user = getAuth().currentUser;
+    if (!user) {
+      alert("No user logged in");
+      return;
+    }
+
+    const uid = user.uid; 
+
+    try {
+      const userDocRef = doc(db, "users", uid);
+      await setDoc(userDocRef, formData);
+
+      console.log("User profile updated successfully");
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    }
   };
 
   return (
@@ -72,18 +117,18 @@ const Profile = () => {
                 <Row>
                   <div className="col">
                     <div className="card-profile-stats d-flex justify-content-center mt-md-5">
-                    <div>
-  <span className="heading">{formData.nickName || "N/A"}</span>
-  <span className="description">Nickname</span>
-</div>
-<div>
-  <span className="heading">{formData.age || "N/A"}</span>
-  <span className="description">Age</span>
-</div>
-<div>
-  <span className="heading">{formData.gender || "N/A"}</span>
-  <span className="description">Gender</span>
-</div>
+                      <div>
+                        <span className="heading">{formData.nickName || "N/A"}</span>
+                        <span className="description">Nickname</span>
+                      </div>
+                      <div>
+                        <span className="heading">{formData.age || "N/A"}</span>
+                        <span className="description">Age</span>
+                      </div>
+                      <div>
+                        <span className="heading">{formData.gender || "N/A"}</span>
+                        <span className="description">Gender</span>
+                      </div>
 
                     </div>
                   </div>
@@ -97,24 +142,24 @@ const Profile = () => {
   
 </div>
 
-<div className="h5 font-weight-300">
-  <i className="ni location_pin mr-2" />
-  {formData.email || ""}
-</div>
+                  <div className="h5 font-weight-300">
+                    <i className="ni location_pin mr-2" />
+                    {formData.email || ""}
+                  </div>
 
-<div className="h5 mt-4">
-  <i className="ni business_briefcase-24 mr-2" />
-  Instagram: {formData.instagram || "Not provided"}
-</div>
-<div className="h5 mt-4">
-  <i className="ni business_briefcase-24 mr-2" />
-  LinkedIn: {formData.linkedin || "Not provided"}
-</div>
+                  <div className="h5 mt-4">
+                    <i className="ni business_briefcase-24 mr-2" />
+                    Instagram: {formData.instagram || "Not provided"}
+                  </div>
+                  <div className="h5 mt-4">
+                    <i className="ni business_briefcase-24 mr-2" />
+                    LinkedIn: {formData.linkedin || "Not provided"}
+                  </div>
 
                   <div>
-  <i className="ni location_pin mr-2" />
-  {formData.city || "City not specified"}
-</div>
+                    <i className="ni location_pin mr-2" />
+                    {formData.city || "City not specified"}
+                  </div>
 
                   <hr className="my-4" />
                   <p>
@@ -325,22 +370,22 @@ const Profile = () => {
                   <hr className="my-4" />
                   <h6 className="heading-small text-muted mb-4">About me</h6>
                   <div className="pl-lg-4">
-                    <FormGroup>
+                        <FormGroup>
                       <label>About Me</label>
-                      <Input
-                        className="form-control-alternative"
+                          <Input
+                            className="form-control-alternative"
                         placeholder="A few words about you ..."
                         rows="4"
-                        type="textarea"
-                        name="about"
-                        value={formData.about}
-                        onChange={handleInputChange}
-                      />
-                    </FormGroup>
+                            type="textarea"
+                            name="about"
+                            value={formData.about}
+                            onChange={handleInputChange}
+                          />
+                        </FormGroup>
                   </div>
                   <Button color="primary" type="submit">
-                    Save
-                  </Button>
+                      Save
+                    </Button>
                 </Form>
               </CardBody>
             </Card>
