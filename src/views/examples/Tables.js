@@ -18,7 +18,7 @@ const chatContacts = [
   { id: 4, name: "Nargis Hawa", status: "offline", avatar: "path/to/avatar4.jpg" },
 ];
 
-const ChatPage = () => {
+const Tables = () => {
   const [searchTerm, setSearchTerm] = useState(""); // State for search input
   const [filteredContacts, setFilteredContacts] = useState(chatContacts); // State for filtered contacts
   const [selectedChat, setSelectedChat] = useState(chatContacts[0]); // Default selected chat
@@ -181,4 +181,4 @@ const ChatPage = () => {
     </>
   );
 };
-
+export default Tables;
