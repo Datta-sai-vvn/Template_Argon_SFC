@@ -1,4 +1,5 @@
 // Import dependencies
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import for navigation (React Router v6)
 import {
   Card,
@@ -9,14 +10,48 @@ import {
   Col,
   Button,
 } from "reactstrap";
+import { getFirestore, collection, getDocs } from "firebase/firestore"; // Firebase Firestore imports
 import Header from "components/Headers/Header.js"; // Header component
 
-const Index = (props) => {
+const Index = () => {
+  const [pastActivities, setPastActivities] = useState([]); // State to store past activities
   const navigate = useNavigate(); // Hook to handle navigation
+  const db = getFirestore(); // Firestore instance
+
+  // Fetch data from Firestore on component mount
+  useEffect(() => {
+    const fetchPastActivities = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "connections"));
+        const activities = [];
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          data.connectedUsers.forEach((user) => {
+            activities.push({
+              event: data.event,
+              dateTime: user.dateTime,
+              name: user.name,
+              age: user.age,
+              gender: user.gender,
+              interestLevel: user.interestLevel,
+            });
+          });
+        });
+
+        setPastActivities(activities); // Update state with fetched activities
+      } catch (error) {
+        console.error("Error fetching past activities:", error);
+      }
+    };
+
+    fetchPastActivities();
+  }, [db]);
 
   // Function to handle redirection
-  const redirectToTablePage = () => {
-    navigate("/admin/chats"); // Replace with the route for the table page
+  const redirectToTablePage = (participantName) => {
+    console.log(`Redirecting to chat with ${participantName}`);
+    navigate("/admin/chats"); // Replace with the actual route for the chat page
   };
 
   return (
@@ -34,7 +69,8 @@ const Index = (props) => {
                 width: "95%",
                 marginLeft: "auto",
                 marginRight: "auto",
-                background: "linear-gradient(90deg, rgba(255, 105, 180, 0.9), rgba(138, 43, 226, 0.9))", // Slightly darker gradient
+                background:
+                  "linear-gradient(90deg, rgba(255, 105, 180, 0.9), rgba(138, 43, 226, 0.9))", // Slightly darker gradient
                 borderRadius: "10px",
                 color: "#fff",
                 boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
@@ -81,70 +117,50 @@ const Index = (props) => {
                     <th scope="col">Event</th>
                     <th scope="col">Date</th>
                     <th scope="col">Participants</th>
+                    <th scope="col">Gender</th>
+                    <th scope="col">Age</th>
+                    <th scope="col">Interest Level</th>
                     <th scope="col">Connect</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>Cooking Event</td>
-                    <td>10/05/2024 6:00 PM</td>
-                    <td>Star Lopez</td>
-                    <td>
-                      <Button
-                        style={{
-                          background: "linear-gradient(90deg, #FF69B4, #8A2BE2)", // Gradient for button
-                          color: "#fff",
-                          border: "none",
-                          padding: "5px 10px",
-                          borderRadius: "5px",
-                          fontWeight: "bold",
-                          textShadow: "1px 1px 2px rgba(0, 0, 0, 0.6)", // Text shadow
-                          transition: "all 0.3s ease",
-                        }}
-                        onMouseOver={(e) =>
-                          (e.target.style.background =
-                            "linear-gradient(90deg, #8A2BE2, #FF69B4)") // Reverse gradient on hover
-                        }
-                        onMouseOut={(e) =>
-                          (e.target.style.background =
-                            "linear-gradient(90deg, #FF69B4, #8A2BE2)")
-                        }
-                        onClick={redirectToTablePage} // Redirect on click
-                      >
-                        Message with Star
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Biking</td>
-                    <td>11/21/2024 8:00 AM</td>
-                    <td>John Tyler</td>
-                    <td>
-                      <Button
-                        style={{
-                          background: "linear-gradient(90deg, #FF69B4, #8A2BE2)", // Gradient for button
-                          color: "#fff",
-                          border: "none",
-                          padding: "5px 10px",
-                          borderRadius: "5px",
-                          fontWeight: "bold",
-                          textShadow: "1px 1px 2px rgba(0, 0, 0, 0.6)", // Text shadow
-                          transition: "all 0.3s ease",
-                        }}
-                        onMouseOver={(e) =>
-                          (e.target.style.background =
-                            "linear-gradient(90deg, #8A2BE2, #FF69B4)") // Reverse gradient on hover
-                        }
-                        onMouseOut={(e) =>
-                          (e.target.style.background =
-                            "linear-gradient(90deg, #FF69B4, #8A2BE2)")
-                        }
-                        onClick={redirectToTablePage} // Redirect on click
-                      >
-                        Message with John
-                      </Button>
-                    </td>
-                  </tr>
+                  {pastActivities.map((activity, index) => (
+                    <tr key={index}>
+                      <td>{activity.event}</td>
+                      <td>{new Date(activity.dateTime).toLocaleString()}</td>
+                      <td>{activity.name}</td>
+                      <td>{activity.gender}</td>
+                      <td>{activity.age}</td>
+                      <td>{activity.interestLevel}</td>
+                      <td>
+                        <Button
+                          style={{
+                            background:
+                              "linear-gradient(90deg, #FF69B4, #8A2BE2)", // Gradient for button
+                            color: "#fff",
+                            border: "none",
+                            padding: "5px 10px",
+                            borderRadius: "5px",
+                            fontWeight: "bold",
+                            textShadow:
+                              "1px 1px 2px rgba(0, 0, 0, 0.6)", // Text shadow
+                            transition: "all 0.3s ease",
+                          }}
+                          onMouseOver={(e) =>
+                            (e.target.style.background =
+                              "linear-gradient(90deg, #8A2BE2, #FF69B4)") // Reverse gradient on hover
+                          }
+                          onMouseOut={(e) =>
+                            (e.target.style.background =
+                              "linear-gradient(90deg, #FF69B4, #8A2BE2)")
+                          }
+                          onClick={() => redirectToTablePage(activity.name)} // Redirect on click
+                        >
+                          Message with {activity.name}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </Table>
             </Card>
@@ -156,4 +172,3 @@ const Index = (props) => {
 };
 
 export default Index;
-
