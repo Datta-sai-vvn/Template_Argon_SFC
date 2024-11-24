@@ -95,7 +95,7 @@ const Register = () => {
     try {
       await signUpUser(email, password);
       console.log("User signed up successfully");
-      navigate('/profile'); 
+      navigate('/login'); 
     } catch (error) {
       console.error("Error signing up: ", error);
     }

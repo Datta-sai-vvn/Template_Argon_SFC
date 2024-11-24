@@ -25,8 +25,8 @@ root.render(
         <Route path="/admin/*" element={<AdminLayout />} />
         <Route path="/auth/*" element={<AuthLayout />} />
 
-        {/* Redirect base path to /admin/index */}
-        <Route path="/" element={<Navigate to="/admin/index" />} />
+        {/* Redirect base path to /register */}
+        <Route path="/" element={<Navigate to="/register" />} />
       </Routes>
     </React.StrictMode>
   </BrowserRouter>
