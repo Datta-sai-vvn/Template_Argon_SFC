@@ -1,25 +1,34 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2024 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
-// reactstrap components
+import React, { useState, useEffect } from "react";
+import { getAuth } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig"; // Import your Firebase configuration
 import { Button, Container, Row, Col } from "reactstrap";
 
 const UserHeader = () => {
+  const [userName, setUserName] = useState("User");
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      const user = getAuth().currentUser;
+      if (user) {
+        try {
+          const userDocRef = doc(db, "users", user.uid);
+          const docSnapshot = await getDoc(userDocRef);
+          if (docSnapshot.exists()) {
+            setUserName(docSnapshot.data().name || "User");
+          } else {
+            setUserName("User");
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          setUserName("User");
+        }
+      }
+    };
+
+    fetchUserName();
+  }, []);
+
   return (
     <>
       <div
@@ -38,11 +47,11 @@ const UserHeader = () => {
         <Container className="d-flex align-items-center" fluid>
           <Row>
             <Col lg="7" md="10">
-              <h1 className="display-2 text-white">Hello Jesse</h1>
+              <h1 className="display-2 text-white">Hello {userName}</h1>
               <p className="text-white mt-0 mb-5">
-                This is your profile page. You can see the progress you've made
-                with your work and manage your projects or assigned tasks
+                This is your profile page. You can edit your profile here for the people to get a better idea about you.
               </p>
+              {/* 
               <Button
                 color="info"
                 href="#pablo"
@@ -50,6 +59,7 @@ const UserHeader = () => {
               >
                 Edit profile
               </Button>
+              */}
             </Col>
           </Row>
         </Container>

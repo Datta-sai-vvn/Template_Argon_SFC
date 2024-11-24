@@ -24,7 +24,7 @@ const MatchingProfile = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [data, setData] = useState([]);
   const [isDataEmpty, setIsDataEmpty] = useState(false);
-  const location = useLocation(); // To access the passed state
+  const location = useLocation();
   const navigate = useNavigate();
   const db = getFirestore();
   const auth = getAuth();
@@ -41,17 +41,17 @@ const MatchingProfile = () => {
       const currentUser = auth.currentUser?.uid;
 
       // Filter by event and exclude self-profile
-      const eventFilter = location.state?.event || ""; // Get selected event from state
+      const eventFilter = location.state?.event || ""; 
       const filtered = usersData
         .filter(
           (user) =>
-            user.selectedEvent === eventFilter && user.id !== currentUser // Exclude self-profile
+            user.selectedEvent === eventFilter && user.id !== currentUser
         )
-        .sort((a, b) => b.interestLevel - a.interestLevel); // Sort by interest level descending
+        .sort((a, b) => b.interestLevel - a.interestLevel); 
 
       setData(filtered);
-      setFilteredData(filtered); // Initialize with filtered data
-      setIsDataEmpty(filtered.length === 0); // Check if the filtered data is empty
+      setFilteredData(filtered);
+      setIsDataEmpty(filtered.length === 0); 
     };
 
     fetchData();
@@ -62,14 +62,14 @@ const MatchingProfile = () => {
     const { name, age, interestLevel, gender } = filters;
     const filtered = data.filter((item) => {
       return (
-        (!name || item.name.toLowerCase().includes(name.toLowerCase())) &&
-        (!age || item.age.toString() === age) &&
-        (!interestLevel || item.interestLevel.toString() === interestLevel) &&
-        (!gender || item.gender.toLowerCase() === gender.toLowerCase())
+        (!name || (item.name && item.name.toLowerCase().includes(name.toLowerCase()))) &&
+        (!age || (item.age && item.age.toString() === age)) &&
+        (!interestLevel || (item.interestLevel && item.interestLevel.toString() === interestLevel)) &&
+        (!gender || (item.gender && item.gender.toLowerCase() === gender.toLowerCase()))
       );
     });
     setFilteredData(filtered);
-    setIsDataEmpty(filtered.length === 0); // Check if no matches found
+    setIsDataEmpty(filtered.length === 0);
   };
 
   return (
