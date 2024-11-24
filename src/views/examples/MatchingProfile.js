@@ -103,7 +103,7 @@ const MatchingProfile = () => {
         console.log("New connection created!");
       }
 
-      alert("Connection saved successfully!");
+      navigate("/admin/chats");
     } catch (error) {
       console.error("Error saving connection:", error);
       alert("Failed to save connection. Please try again.");
