@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Row,
@@ -10,39 +10,88 @@ import {
   Form,
 } from "reactstrap";
 import Header from "components/Headers/Header.js";
+import { collection, addDoc, query, orderBy, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig";
+import { getAuth } from "firebase/auth"; 
 
-const chatContacts = [
-  { id: 1, name: "Maryam Naz", status: "online", avatar: "path/to/avatar1.jpg" },
-  { id: 2, name: "Sahar Darya", status: "offline", avatar: "path/to/avatar2.jpg" },
-  { id: 3, name: "Yolduz Rafi", status: "online", avatar: "path/to/avatar3.jpg" },
-  { id: 4, name: "Nargis Hawa", status: "offline", avatar: "path/to/avatar4.jpg" },
-];
+
 
 const Tables = () => {
-  const [searchTerm, setSearchTerm] = useState(""); // State for search input
-  const [filteredContacts, setFilteredContacts] = useState(chatContacts); // State for filtered contacts
-  const [selectedChat, setSelectedChat] = useState(chatContacts[0]); // Default selected chat
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Hi, how are you?", sender: "other" },
-    { id: 2, text: "I'm good, how about you?", sender: "self" },
-  ]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredContacts, setFilteredContacts] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
-  // Function to handle searching
+  const auth = getAuth();
+  const currentUserUid = auth.currentUser?.uid;
+
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const contactsCollection = collection(db, "users");
+        const q = query(contactsCollection);
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+          const contacts = snapshot.docs
+            .map((doc) => ({
+              id: doc.id,
+              uid: doc.id,
+              ...doc.data(),
+            }))
+            .filter((contact) => contact.uid !== currentUserUid); 
+
+          setFilteredContacts(contacts);
+
+          if (!selectedChat && contacts.length > 0) {
+            setSelectedChat(contacts[0]);
+          }
+        });
+
+        return unsubscribe;
+      } catch (error) {
+        console.error("Error fetching contacts: ", error);
+      }
+    };
+
+    fetchContacts();
+  }, [currentUserUid, selectedChat]);
+
   const handleSearch = (event) => {
     const value = event.target.value.toLowerCase();
     setSearchTerm(value);
 
-    const filtered = chatContacts.filter((contact) =>
+    const filtered = filteredContacts.filter((contact) =>
       contact.name.toLowerCase().includes(value)
     );
     setFilteredContacts(filtered);
   };
 
-  const handleSendMessage = () => {
+  useEffect(() => {
+    const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedMessages = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMessages(fetchedMessages);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleSendMessage = async () => {
     if (newMessage.trim()) {
-      setMessages([...messages, { id: messages.length + 1, text: newMessage, sender: "self" }]);
-      setNewMessage("");
+      try {
+        await addDoc(collection(db, "messages"), {
+          text: newMessage,
+          senderUid: currentUserUid,
+          receiverUid: selectedChat?.uid,
+          timestamp: new Date(),
+        });
+        setNewMessage("");
+      } catch (error) {
+        console.error("Error sending message: ", error);
+      }
     }
   };
 
@@ -51,7 +100,6 @@ const Tables = () => {
       <Header />
       <Container className="mt--7" fluid>
         <Row>
-          {/* Sidebar */}
           <Col lg="4" md="4" sm="12" className="p-0" style={{ borderRight: "1px solid #ddd" }}>
             <Card className="shadow">
               <CardBody style={{ height: "100vh", overflowY: "auto", padding: "10px" }}>
@@ -68,15 +116,15 @@ const Tables = () => {
                 />
                 {filteredContacts.map((contact) => (
                   <div
-                    key={contact.id}
+                    key={contact.uid}
                     className={`d-flex align-items-center p-2 mb-2 ${
-                      selectedChat.id === contact.id ? "bg-light" : ""
+                      selectedChat?.uid === contact.uid ? "bg-light" : ""
                     }`}
                     style={{ cursor: "pointer", borderRadius: "10px" }}
                     onClick={() => setSelectedChat(contact)}
                   >
                     <img
-                      src={contact.avatar}
+                      src={contact.avatar || "default-avatar.jpg"}
                       alt={contact.name}
                       className="rounded-circle"
                       style={{ width: "50px", height: "50px", marginRight: "10px" }}
@@ -95,66 +143,69 @@ const Tables = () => {
             </Card>
           </Col>
 
-          {/* Chat Section */}
           <Col lg="8" md="8" sm="12" className="p-0">
             <Card className="shadow">
               <CardBody style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-                {/* Chat Header */}
-                <div
-                  className="d-flex align-items-center justify-content-between"
-                  style={{ borderBottom: "1px solid #ddd", paddingBottom: "10px", marginBottom: "10px" }}
-                >
-                  <div className="d-flex align-items-center">
-                    <img
-                      src={selectedChat.avatar}
-                      alt={selectedChat.name}
-                      className="rounded-circle"
-                      style={{ width: "50px", height: "50px", marginRight: "10px" }}
-                    />
-                    <div>
-                      <h5 className="mb-0">{selectedChat.name}</h5>
-                      <small
-                        className={selectedChat.status === "online" ? "text-success" : "text-muted"}
-                      >
-                        {selectedChat.status === "online" ? "Online" : "Offline"}
-                      </small>
-                    </div>
-                  </div>
-                  <div>
-                    <Button color="info" size="sm" className="mr-2">
-                      <i className="ni ni-camera-compact" />
-                    </Button>
-                    <Button color="primary" size="sm">
-                      <i className="ni ni-chat-round" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Chat Messages */}
-                <div style={{ flex: 1, overflowY: "auto", padding: "10px" }}>
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`d-flex ${
-                        message.sender === "self" ? "justify-content-end" : "justify-content-start"
-                      } mb-3`}
-                    >
-                      <div
-                        style={{
-                          maxWidth: "70%",
-                          padding: "10px 15px",
-                          borderRadius: "20px",
-                          backgroundColor: message.sender === "self" ? "#00bfff" : "#f1f1f1",
-                          color: message.sender === "self" ? "#fff" : "#000",
-                        }}
-                      >
-                        {message.text}
+                {selectedChat && (
+                  <div
+                    className="d-flex align-items-center justify-content-between"
+                    style={{ borderBottom: "1px solid #ddd", paddingBottom: "10px", marginBottom: "10px" }}
+                  >
+                    <div className="d-flex align-items-center">
+                      <img
+                        src={selectedChat.avatar || "default-avatar.jpg"}
+                        alt={selectedChat.name}
+                        className="rounded-circle"
+                        style={{ width: "50px", height: "50px", marginRight: "10px" }}
+                      />
+                      <div>
+                        <h5 className="mb-0">{selectedChat.name}</h5>
+                        <small
+                          className={
+                            selectedChat.status === "online" ? "text-success" : "text-muted"
+                          }
+                        >
+                          {selectedChat.status === "online" ? "Online" : "Offline"}
+                        </small>
                       </div>
                     </div>
-                  ))}
+                  </div>
+                )}
+
+                <div style={{ flex: 1, overflowY: "auto", padding: "10px" }}>
+                  {messages
+                    .filter(
+                      (message) =>
+                        (message.senderUid === currentUserUid &&
+                          message.receiverUid === selectedChat?.uid) ||
+                        (message.senderUid === selectedChat?.uid &&
+                          message.receiverUid === currentUserUid)
+                    )
+                    .map((message) => (
+                      <div
+                        key={message.id}
+                        className={`d-flex ${
+                          message.senderUid === currentUserUid
+                            ? "justify-content-end"
+                            : "justify-content-start"
+                        } mb-3`}
+                      >
+                        <div
+                          style={{
+                            maxWidth: "70%",
+                            padding: "10px 15px",
+                            borderRadius: "20px",
+                            backgroundColor:
+                              message.senderUid === currentUserUid ? "#00bfff" : "#f1f1f1",
+                            color: message.senderUid === currentUserUid ? "#fff" : "#000",
+                          }}
+                        >
+                          {message.text}
+                        </div>
+                      </div>
+                    ))}
                 </div>
 
-                {/* Chat Input */}
                 <Form
                   className="d-flex align-items-center"
                   onSubmit={(e) => {
@@ -181,4 +232,6 @@ const Tables = () => {
     </>
   );
 };
+
 export default Tables;
+
