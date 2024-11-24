@@ -1,4 +1,8 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { getAuth } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig"; // Import your firebase config
 // reactstrap components
 import {
   DropdownMenu,
@@ -18,7 +22,31 @@ import {
 } from "reactstrap";
 
 const AdminNavbar = (props) => {
+  const [userName, setUserName] = useState(""); // State to hold the user's name
   const location = useLocation();
+
+  // Fetch user data when the component mounts
+  useEffect(() => {
+    const fetchUserName = async () => {
+      const user = getAuth().currentUser;
+      if (user) {
+        const userDocRef = doc(db, "users", user.uid);
+        try {
+          const docSnap = await getDoc(userDocRef);
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            setUserName(userData.name || "User"); // Set name if available, else fallback to "User"
+          } else {
+            console.log("No user data found");
+          }
+        } catch (error) {
+          console.error("Error fetching user data: ", error);
+        }
+      }
+    };
+
+    fetchUserName();
+  }, []);
 
   // Define the pages where the navbar should not appear
   const noNavbarRoutes = ["/admin/matching-profile"];
@@ -57,12 +85,12 @@ const AdminNavbar = (props) => {
                   <span className="avatar avatar-sm rounded-circle">
                     <img
                       alt="..."
-                      src={require("../../assets/img/theme/team-4-800x800.jpg")}
+                      src={require("../../assets/img/theme/profilepic.jpeg")}
                     />
                   </span>
                   <Media className="ml-2 d-none d-lg-block">
                     <span className="mb-0 text-sm font-weight-bold">
-                      Jessica Jones
+                      {userName} {/* Dynamically display user name */}
                     </span>
                   </Media>
                 </Media>
