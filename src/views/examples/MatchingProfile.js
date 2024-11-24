@@ -10,7 +10,16 @@ import {
   FormGroup,
   Label,
 } from "reactstrap";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+  setDoc,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 
@@ -41,36 +50,92 @@ const MatchingProfile = () => {
       const currentUser = auth.currentUser?.uid;
 
       // Filter by event and exclude self-profile
-      const eventFilter = location.state?.event || ""; 
+      const eventFilter = location.state?.event || "";
       const filtered = usersData
         .filter(
           (user) =>
             user.selectedEvent === eventFilter && user.id !== currentUser
         )
-        .sort((a, b) => b.interestLevel - a.interestLevel); 
+        .sort((a, b) => b.interestLevel - a.interestLevel);
 
       setData(filtered);
       setFilteredData(filtered);
-      setIsDataEmpty(filtered.length === 0); 
+      setIsDataEmpty(filtered.length === 0);
     };
 
     fetchData();
   }, [db, location.state, auth.currentUser]);
 
+  // Save connection to Firebase without duplicates
+  const saveConnection = async (currentUserId, eventId, connectedUser) => {
+    const docRef = doc(collection(db, "connections"), `${currentUserId}_${eventId}`);
+    try {
+      const docSnapshot = await getDoc(docRef);
+      const connectionData = {
+        userId: connectedUser.id,
+        name: connectedUser.name,
+        age: connectedUser.age,
+        gender: connectedUser.gender,
+        interestLevel: connectedUser.interestLevel,
+        dateTime: new Date().toISOString(),
+      };
+
+      if (docSnapshot.exists()) {
+        const existingData = docSnapshot.data();
+        const existingConnections = existingData.connectedUsers || [];
+        const isAlreadyConnected = existingConnections.some(
+          (conn) => conn.userId === connectedUser.id
+        );
+
+        if (!isAlreadyConnected) {
+          await setDoc(docRef, {
+            ...existingData,
+            connectedUsers: [...existingConnections, connectionData],
+          });
+          console.log("Connection added!");
+        }
+      } else {
+        await setDoc(docRef, {
+          userId: currentUserId,
+          event: eventId,
+          connectedUsers: [connectionData],
+        });
+        console.log("New connection created!");
+      }
+
+      alert("Connection saved successfully!");
+    } catch (error) {
+      console.error("Error saving connection:", error);
+      alert("Failed to save connection. Please try again.");
+    }
+  };
+
   // Apply additional filters
   const applyFilters = () => {
     const { name, age, interestLevel, gender } = filters;
+  
+    // Helper function to check if an age falls within a range
+    const isAgeInRange = (ageValue, range) => {
+      if (!range) return true; // If no range is selected, allow all ages
+      if (range === "55 and above") return ageValue >= 55; // Special case for "55 and above"
+      const [min, max] = range.split("-").map((value) => parseInt(value));
+      return ageValue >= min && ageValue <= max;
+    };
+    
+  
     const filtered = data.filter((item) => {
       return (
         (!name || (item.name && item.name.toLowerCase().includes(name.toLowerCase()))) &&
-        (!age || (item.age && item.age.toString() === age)) &&
+        (!age || isAgeInRange(item.age, age)) &&
         (!interestLevel || (item.interestLevel && item.interestLevel.toString() === interestLevel)) &&
         (!gender || (item.gender && item.gender.toLowerCase() === gender.toLowerCase()))
       );
     });
+  
     setFilteredData(filtered);
     setIsDataEmpty(filtered.length === 0);
   };
+  
 
   return (
     <Card
@@ -123,7 +188,7 @@ const MatchingProfile = () => {
               </Label>
               <Input
                 id="ageFilter"
-                placeholder="Enter Age"
+                type="select"
                 value={filters.age}
                 onChange={(e) => setFilters({ ...filters, age: e.target.value })}
                 style={{
@@ -132,7 +197,14 @@ const MatchingProfile = () => {
                   border: "1px solid #ddd",
                   background: "#f4f5f7",
                 }}
-              />
+              >
+                <option value="">Select Age</option>
+                <option value="18-25">18-25</option>
+                <option value="25-35">25-35</option>
+                <option value="35-45">35-45</option>
+                <option value="45-55">45-55</option>
+                <option value="55 and above">55 and above</option>
+              </Input>
             </FormGroup>
           </Col>
           <Col md="3">
@@ -142,7 +214,7 @@ const MatchingProfile = () => {
               </Label>
               <Input
                 id="interestLevelFilter"
-                placeholder="Enter Interest Level"
+                type="select"
                 value={filters.interestLevel}
                 onChange={(e) => setFilters({ ...filters, interestLevel: e.target.value })}
                 style={{
@@ -151,7 +223,14 @@ const MatchingProfile = () => {
                   border: "1px solid #ddd",
                   background: "#f4f5f7",
                 }}
-              />
+              >
+                <option value="">Select Interest Level</option>
+                {[...Array(10).keys()].map((level) => (
+                  <option key={level + 1} value={10 - level}>
+                    {10 - level}
+                  </option>
+                ))}
+              </Input>
             </FormGroup>
           </Col>
           <Col md="3">
@@ -161,7 +240,7 @@ const MatchingProfile = () => {
               </Label>
               <Input
                 id="genderFilter"
-                placeholder="Enter Gender (Male/Female)"
+                type="select"
                 value={filters.gender}
                 onChange={(e) => setFilters({ ...filters, gender: e.target.value })}
                 style={{
@@ -170,7 +249,12 @@ const MatchingProfile = () => {
                   border: "1px solid #ddd",
                   background: "#f4f5f7",
                 }}
-              />
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="others">Others</option>
+              </Input>
             </FormGroup>
           </Col>
           <Col md="12" style={{ textAlign: "center" }}>
@@ -250,7 +334,9 @@ const MatchingProfile = () => {
                     <Button
                       color="primary"
                       size="sm"
-                      onClick={() => navigate("/admin/chats")}
+                      onClick={() =>
+                        saveConnection(auth.currentUser?.uid, location.state?.event, row)
+                      }
                       style={{
                         background: "linear-gradient(90deg, #FF6F91, #5D3FD3)",
                         borderColor: "transparent",
