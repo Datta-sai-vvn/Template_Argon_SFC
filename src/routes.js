@@ -31,7 +31,7 @@ var routes = [
   },
   {
     path: "/profile",
-    name: "Your Profile",
+    name: "My Profile",
     icon: "ni ni-single-02 text-yellow",
     component: <Profile />,
     layout: "/admin",

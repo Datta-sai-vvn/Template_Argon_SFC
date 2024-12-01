@@ -380,6 +380,22 @@ const Profile = () => {
                       </Col>
                     </Row>
                   </div>
+                  <hr className="my-4" />
+                  <h6 className="heading-small text-muted mb-4">About me</h6>
+                  <div className="pl-lg-4">
+                        <FormGroup>
+                      <label>About Me</label>
+                          <Input
+                            className="form-control-alternative"
+                        placeholder="A few words about you ..."
+                        rows="4"
+                            type="textarea"
+                            name="about"
+                            value={formData.about}
+                            onChange={handleInputChange}
+                          />
+                        </FormGroup>
+                  </div>
                   <Row>
                     <Col>
                       <Button color="primary" type="submit">

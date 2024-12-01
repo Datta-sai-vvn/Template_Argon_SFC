@@ -88,6 +88,7 @@ const Index = () => {
                   className="mb-0"
                   style={{
                     fontWeight: "bold",
+                    color: "#fff", // Ensures text is white
                     textShadow: "1px 1px 3px rgba(0, 0, 0, 0.6)", // Shadow for readability
                   }}
                 >
