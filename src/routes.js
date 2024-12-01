@@ -37,7 +37,7 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/chats",
+    path: "/chats/:uid",
     name: "Messages",
     icon: "fas fa-comments text-red",
     component: <Tables />,

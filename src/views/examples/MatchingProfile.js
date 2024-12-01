@@ -83,14 +83,14 @@ const MatchingProfile = () => {
         interestLevel: connectedUser.interestLevel,
         dateTime: new Date().toISOString(),
       };
-
+  
       if (docSnapshot.exists()) {
         const existingData = docSnapshot.data();
         const existingConnections = existingData.connectedUsers || [];
         const isAlreadyConnected = existingConnections.some(
           (conn) => conn.userId === connectedUser.id
         );
-
+  
         if (!isAlreadyConnected) {
           await setDoc(docRef, {
             ...existingData,
@@ -106,13 +106,15 @@ const MatchingProfile = () => {
         });
         console.log("New connection created!");
       }
-
-      navigate("/admin/chats");
+  
+      // Redirect to the chat page of the connected user
+      navigate(`/admin/chats/${connectedUser.id}`); // Redirect to the chat page for the connected user
     } catch (error) {
       console.error("Error saving connection:", error);
       alert("Failed to save connection. Please try again.");
     }
   };
+  
 
   // Apply additional filters
   const applyFilters = () => {

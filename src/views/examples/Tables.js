@@ -3,29 +3,31 @@ import {
   Container,
   Row,
   Col,
-  Input,
   Button,
   Card,
   CardBody,
   Form,
+  Input,
 } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import { collection, addDoc, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
-import { getAuth } from "firebase/auth"; 
-
-
+import { getAuth } from "firebase/auth";
+import { useParams, useNavigate } from "react-router-dom";
 
 const Tables = () => {
-  const [searchTerm, setSearchTerm] = useState("");
   const [filteredContacts, setFilteredContacts] = useState([]);
-  const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
+  const { uid } = useParams(); // Get the uid from the route
+  const navigate = useNavigate();
   const auth = getAuth();
   const currentUserUid = auth.currentUser?.uid;
 
+  const selectedChat = filteredContacts.find((contact) => contact.uid === uid);
+
+  // Fetch contacts and select the first one by default
   useEffect(() => {
     const fetchContacts = async () => {
       try {
@@ -38,12 +40,13 @@ const Tables = () => {
               uid: doc.id,
               ...doc.data(),
             }))
-            .filter((contact) => contact.uid !== currentUserUid); 
+            .filter((contact) => contact.uid !== currentUserUid);
 
           setFilteredContacts(contacts);
 
-          if (!selectedChat && contacts.length > 0) {
-            setSelectedChat(contacts[0]);
+          // Redirect to the first contact if no uid is in the URL
+          if (!uid && contacts.length > 0) {
+            navigate(`/admin/chats/${contacts[0].uid}`);
           }
         });
 
@@ -54,18 +57,9 @@ const Tables = () => {
     };
 
     fetchContacts();
-  }, [currentUserUid, selectedChat]);
+  }, [currentUserUid, uid, navigate]);
 
-  const handleSearch = (event) => {
-    const value = event.target.value.toLowerCase();
-    setSearchTerm(value);
-
-    const filtered = filteredContacts.filter((contact) =>
-      contact.name.toLowerCase().includes(value)
-    );
-    setFilteredContacts(filtered);
-  };
-
+  // Fetch messages
   useEffect(() => {
     const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -103,29 +97,18 @@ const Tables = () => {
           <Col lg="4" md="4" sm="12" className="p-0" style={{ borderRight: "1px solid #ddd" }}>
             <Card className="shadow">
               <CardBody style={{ height: "100vh", overflowY: "auto", padding: "10px" }}>
-                <Input
-                  type="text"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  placeholder="Search..."
-                  style={{
-                    marginBottom: "15px",
-                    borderRadius: "20px",
-                    padding: "10px 15px",
-                  }}
-                />
                 {filteredContacts.map((contact) => (
                   <div
                     key={contact.uid}
                     className={`d-flex align-items-center p-2 mb-2 ${
-                      selectedChat?.uid === contact.uid ? "bg-light" : ""
+                      uid === contact.uid ? "bg-light" : ""
                     }`}
                     style={{ cursor: "pointer", borderRadius: "10px" }}
-                    onClick={() => setSelectedChat(contact)}
+                    onClick={() => navigate(`/admin/chats/${contact.uid}`)}
                   >
                     <img
-                      src={contact.avatar || "default-avatar.jpg"}
-                      alt={contact.name}
+                      src={require("../../assets/img/theme/profilepic.jpeg")} 
+                      alt='...'
                       className="rounded-circle"
                       style={{ width: "50px", height: "50px", marginRight: "10px" }}
                     />
@@ -153,8 +136,8 @@ const Tables = () => {
                   >
                     <div className="d-flex align-items-center">
                       <img
-                        src={selectedChat.avatar || "default-avatar.jpg"}
-                        alt={selectedChat.name}
+                        src={require("../../assets/img/theme/profilepic.jpeg")} 
+                        alt='...'
                         className="rounded-circle"
                         style={{ width: "50px", height: "50px", marginRight: "10px" }}
                       />
@@ -234,4 +217,3 @@ const Tables = () => {
 };
 
 export default Tables;
-

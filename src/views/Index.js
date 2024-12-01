@@ -17,6 +17,7 @@ const Index = () => {
   const [pastActivities, setPastActivities] = useState([]); // State to store past activities
   const navigate = useNavigate(); // Hook to handle navigation
   const db = getFirestore(); // Firestore instance
+  const [loading, setLoading] = useState(true);
 
   // Fetch data from Firestore on component mount
   useEffect(() => {
@@ -24,9 +25,9 @@ const Index = () => {
       try {
         const querySnapshot = await getDocs(collection(db, "connections"));
         const activities = [];
-
         querySnapshot.forEach((doc) => {
           const data = doc.data();
+          console.log("Fetched data: ", data);  // Log the fetched data for inspection
           data.connectedUsers.forEach((user) => {
             activities.push({
               event: data.event,
@@ -35,24 +36,31 @@ const Index = () => {
               age: user.age,
               gender: user.gender,
               interestLevel: user.interestLevel,
+              uid: user.userId,
             });
           });
         });
-
-        setPastActivities(activities); // Update state with fetched activities
+        setPastActivities(activities);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching past activities:", error);
+        setLoading(false);
       }
     };
-
     fetchPastActivities();
   }, [db]);
+  
 
   // Function to handle redirection
-  const redirectToTablePage = (participantName) => {
-    console.log(`Redirecting to chat with ${participantName}`);
-    navigate("/admin/chats"); // Replace with the actual route for the chat page
+  const redirectToTablePage = (participantName, uid) => {
+    if (uid) {
+      console.log(`Redirecting to chat with ${participantName}, UID: ${uid}`);
+      navigate(`/admin/chats/${uid}`);
+    } else {
+      console.error(`Error: ${participantName} does not have a valid UID.`);
+    }
   };
+  
 
   return (
     <>
@@ -155,7 +163,7 @@ const Index = () => {
                             (e.target.style.background =
                               "linear-gradient(90deg, #FF69B4, #8A2BE2)")
                           }
-                          onClick={() => redirectToTablePage(activity.name)} // Redirect on click
+                          onClick={() => redirectToTablePage(activity.name, activity.uid)} // Redirect on click
                         >
                           Message with {activity.name}
                         </Button>
