@@ -1,5 +1,6 @@
 // Import dependencies
 import React, { useState, useEffect } from "react";
+import { getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom"; // Import for navigation (React Router v6)
 import {
   Card,
@@ -10,35 +11,45 @@ import {
   Col,
   Button,
 } from "reactstrap";
-import { getFirestore, collection, getDocs } from "firebase/firestore"; // Firebase Firestore imports
-import Header from "components/Headers/Header.js"; // Header component
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+import Header from "components/Headers/Header.js";
 
 const Index = () => {
-  const [pastActivities, setPastActivities] = useState([]); // State to store past activities
-  const navigate = useNavigate(); // Hook to handle navigation
-  const db = getFirestore(); // Firestore instance
+  const [pastActivities, setPastActivities] = useState([]);
+  const navigate = useNavigate();
+  const db = getFirestore();
   const [loading, setLoading] = useState(true);
 
-  // Fetch data from Firestore on component mount
+
+const auth = getAuth();
+
   useEffect(() => {
     const fetchPastActivities = async () => {
       try {
+        const currentUser = auth.currentUser?.uid;
+
+        if (!currentUser) {
+          setPastActivities([]);
+          return;
+        }
+
         const querySnapshot = await getDocs(collection(db, "connections"));
         const activities = [];
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          console.log("Fetched data: ", data);  // Log the fetched data for inspection
-          data.connectedUsers.forEach((user) => {
-            activities.push({
-              event: data.event,
-              dateTime: user.dateTime,
-              name: user.name,
-              age: user.age,
-              gender: user.gender,
-              interestLevel: user.interestLevel,
-              uid: user.userId,
+          if (data.userId === currentUser) {
+            data.connectedUsers.forEach((user) => {
+              activities.push({
+                event: data.event,
+                dateTime: user.dateTime,
+                name: user.name,
+                age: user.age,
+                gender: user.gender,
+                interestLevel: user.interestLevel,
+                uid: user.userId,
+              });
             });
-          });
+          }
         });
         setPastActivities(activities);
         setLoading(false);
