@@ -10,7 +10,7 @@ import {
   Input,
 } from "reactstrap";
 import Header from "components/Headers/Header.js";
-import { collection, addDoc, query, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, addDoc, query, orderBy, onSnapshot, getDocs, where } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { getAuth } from "firebase/auth";
 import { useParams, useNavigate } from "react-router-dom";
@@ -31,33 +31,49 @@ const Tables = () => {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const contactsCollection = collection(db, "users");
-        const q = query(contactsCollection);
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-          const contacts = snapshot.docs
-            .map((doc) => ({
-              id: doc.id,
-              uid: doc.id,
-              ...doc.data(),
-            }))
-            .filter((contact) => contact.uid !== currentUserUid);
-
-          setFilteredContacts(contacts);
-
-          // Redirect to the first contact if no uid is in the URL
-          if (!uid && contacts.length > 0) {
-            navigate(`/admin/chats/${contacts[0].uid}`);
+        if (!currentUserUid) return;
+  
+        // Fetch the current user's connections
+        const connectionsQuery = query(
+          collection(db, "connections"),
+          where("userId", "==", currentUserUid)
+        );
+        const snapshot = await getDocs(connectionsQuery);
+  
+        const connectedUserIds = new Set();
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.connectedUsers) {
+            data.connectedUsers.forEach((user) => connectedUserIds.add(user.userId));
           }
         });
-
-        return unsubscribe;
+  
+        // Fetch user data for connected users
+        const contactsCollection = collection(db, "users");
+        const contactsSnapshot = await getDocs(contactsCollection);
+  
+        const contacts = contactsSnapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            uid: doc.id,
+            ...doc.data(),
+          }))
+          .filter((contact) => connectedUserIds.has(contact.uid));
+  
+        setFilteredContacts(contacts);
+  
+        // Redirect to the first contact if no uid is in the URL
+        if (!uid && contacts.length > 0) {
+          navigate(`/admin/chats/${contacts[0].uid}`);
+        }
       } catch (error) {
         console.error("Error fetching contacts: ", error);
       }
     };
-
+  
     fetchContacts();
   }, [currentUserUid, uid, navigate]);
+  
 
   // Fetch messages
   useEffect(() => {
