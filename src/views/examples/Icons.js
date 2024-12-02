@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { getDoc } from "firebase/firestore";
 // reactstrap components
 import {
   Card,
@@ -13,7 +14,7 @@ import {
 import Header from "components/Headers/Header.js";
 import { useNavigate } from "react-router-dom"; 
 import { getFirestore, doc, setDoc } from "firebase/firestore"; 
-import { getAuth } from "firebase/auth"; 
+import { getAuth } from "firebase/auth";
 
 // Event List
 const eventList = [
@@ -65,22 +66,38 @@ const Icons = () => {
       alert("Please select an event before continuing.");
       return;
     }
-
+  
     const user = auth.currentUser;
     if (!user) {
       alert("No user is logged in.");
       return;
     }
-
-    const uid = user.uid; 
-    const userDocRef = doc(db, "users", uid); 
-
+  
+    const uid = user.uid;
+    const userDocRef = doc(db, "users", uid);
+  
     try {
-      await setDoc(userDocRef, {
-        selectedEvent,
-        interestLevel,
-      }, { merge: true });
-
+      // Fetch user profile to check mandatory fields
+      const docSnapshot = await getDoc(userDocRef);
+      if (docSnapshot.exists()) {
+        const userData = docSnapshot.data();
+        const { name, gender, age } = userData;
+  
+        if (!name || !gender || !age) {
+          // Show alert and redirect
+          alert("Please complete your profile (Name, Gender, and Age) before selecting an event.");
+          navigate("/admin/profile");
+          return;
+        }
+      } else {
+        alert("No user data found. Please complete your profile.");
+        navigate("/admin/profile");
+        return;
+      }
+  
+      // Save event and interest level if profile is complete
+      await setDoc(userDocRef, { selectedEvent, interestLevel }, { merge: true });
+  
       console.log("Event and interest level saved successfully.");
       navigate("/admin/matching-profile", {
         state: { event: selectedEvent, interestLevel },
@@ -90,6 +107,7 @@ const Icons = () => {
       alert("An error occurred while saving your data.");
     }
   };
+  
 
   return (
     <>
