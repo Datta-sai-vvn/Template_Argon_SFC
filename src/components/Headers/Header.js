@@ -1,6 +1,44 @@
+import React, { useEffect, useState } from "react";
 import { Card, CardBody, CardTitle, Container, Row, Col } from "reactstrap";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig";
+import { getAuth } from "firebase/auth";
 
 const Header = () => {
+  const [friendCount, setFriendCount] = useState(0);
+
+  const fetchFriendCount = async () => {
+    try {
+      const auth = getAuth();
+      const currentUserUid = auth.currentUser?.uid;
+
+      if (!currentUserUid) return;
+
+      const connectionsQuery = query(
+        collection(db, "connections"),
+        where("userId", "==", currentUserUid)
+      );
+
+      const snapshot = await getDocs(connectionsQuery);
+      let totalFriends = 0;
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.connectedUsers) {
+          totalFriends += data.connectedUsers.length;
+        }
+      });
+
+      setFriendCount(totalFriends);
+    } catch (error) {
+      console.error("Error fetching friend count:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFriendCount();
+  }, []);
+
   return (
     <>
       <div
@@ -71,7 +109,7 @@ const Header = () => {
                         >
                           Friends
                         </CardTitle>
-                        <span className="h2 font-weight-bold mb-0">7</span>
+                        <span className="h2 font-weight-bold mb-0">{friendCount}</span>
                       </Col>
                       <Col xs="auto">
                         <div className="icon icon-shape bg-yellow text-white rounded-circle shadow">
