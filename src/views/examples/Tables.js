@@ -128,86 +128,105 @@ const Tables = () => {
 
           <Col lg="8" md="8" sm="12" className="p-0">
             <Card className="shadow">
-              <CardBody style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-                {selectedChat && (
+            <CardBody style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+              {selectedChat ? (
+                <>
+                  {/* Selected chat header */}
                   <div
                     className="d-flex align-items-center justify-content-between"
                     style={{ borderBottom: "1px solid #ddd", paddingBottom: "10px", marginBottom: "10px" }}
                   >
                     <div className="d-flex align-items-center">
                       <img
-                        src={require("../../assets/img/theme/profilepic.jpeg")} 
-                        alt='...'
+                        src={require("../../assets/img/theme/profilepic.jpeg")}
+                        alt="..."
                         className="rounded-circle"
                         style={{ width: "50px", height: "50px", marginRight: "10px" }}
                       />
                       <div>
                         <h5 className="mb-0">{selectedChat.name}</h5>
                         <small
-                          className={
-                            selectedChat.status === "online" ? "text-success" : "text-muted"
-                          }
+                          className={selectedChat.status === "online" ? "text-success" : "text-muted"}
                         >
                           {selectedChat.status === "online" ? "Online" : "Offline"}
                         </small>
                       </div>
                     </div>
                   </div>
-                )}
 
-                <div style={{ flex: 1, overflowY: "auto", padding: "10px" }}>
-                  {messages
-                    .filter(
-                      (message) =>
-                        (message.senderUid === currentUserUid &&
-                          message.receiverUid === selectedChat?.uid) ||
-                        (message.senderUid === selectedChat?.uid &&
-                          message.receiverUid === currentUserUid)
-                    )
-                    .map((message) => (
-                      <div
-                        key={message.id}
-                        className={`d-flex ${
-                          message.senderUid === currentUserUid
-                            ? "justify-content-end"
-                            : "justify-content-start"
-                        } mb-3`}
-                      >
+                  {/* Chat messages */}
+                  <div style={{ flex: 1, overflowY: "auto", padding: "10px" }}>
+                    {messages
+                      .filter(
+                        (message) =>
+                          (message.senderUid === currentUserUid &&
+                            message.receiverUid === selectedChat?.uid) ||
+                          (message.senderUid === selectedChat?.uid &&
+                            message.receiverUid === currentUserUid)
+                      )
+                      .map((message) => (
                         <div
-                          style={{
-                            maxWidth: "70%",
-                            padding: "10px 15px",
-                            borderRadius: "20px",
-                            backgroundColor:
-                              message.senderUid === currentUserUid ? "#00bfff" : "#f1f1f1",
-                            color: message.senderUid === currentUserUid ? "#fff" : "#000",
-                          }}
+                          key={message.id}
+                          className={`d-flex ${
+                            message.senderUid === currentUserUid
+                              ? "justify-content-end"
+                              : "justify-content-start"
+                          } mb-3`}
                         >
-                          {message.text}
+                          <div
+                            style={{
+                              maxWidth: "70%",
+                              padding: "10px 15px",
+                              borderRadius: "20px",
+                              backgroundColor:
+                                message.senderUid === currentUserUid ? "#00bfff" : "#f1f1f1",
+                              color: message.senderUid === currentUserUid ? "#fff" : "#000",
+                            }}
+                          >
+                            {message.text}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                </div>
+                      ))}
+                  </div>
 
-                <Form
-                  className="d-flex align-items-center"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSendMessage();
+                  {/* Message input */}
+                  <Form
+                    className="d-flex align-items-center"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }}
+                  >
+                    <Input
+                      type="text"
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder="Type your message..."
+                      style={{ flex: 1, borderRadius: "20px", marginRight: "10px" }}
+                    />
+                    <Button color="primary" size="lg" onClick={handleSendMessage}>
+                      <i className="ni ni-send" />
+                    </Button>
+                  </Form>
+                </>
+              ) : (
+                // Placeholder message
+                <div
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    color: "#888",
+                    textAlign: "center",
                   }}
                 >
-                  <Input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Type your message..."
-                    style={{ flex: 1, borderRadius: "20px", marginRight: "10px" }}
-                  />
-                  <Button color="primary" size="lg" onClick={handleSendMessage}>
-                    <i className="ni ni-send" />
-                  </Button>
-                </Form>
-              </CardBody>
+                  <h3>Welcome to Chat</h3>
+                  <p>Select a contact to start chatting</p>
+                </div>
+              )}
+            </CardBody>
             </Card>
           </Col>
         </Row>
